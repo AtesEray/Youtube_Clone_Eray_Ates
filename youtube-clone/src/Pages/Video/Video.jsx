@@ -1,11 +1,12 @@
 import React from 'react'
 import './Video.css'
+import PlayerVideo from '../../Components/PlayerVideo/PlayerVideo'
 const Video = () => {
   return (
-    <div>
-      
+    <div className='play-container'>
+      <PlayerVideo></PlayerVideo>
     </div>
   )
 }
-import './Video.css'
+
 export default Video
