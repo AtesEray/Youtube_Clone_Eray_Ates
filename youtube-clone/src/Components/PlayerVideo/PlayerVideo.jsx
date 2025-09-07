@@ -9,7 +9,10 @@ import eray from '../../assets/eray.jpg'
 import user_profile from '../../assets/user_profile.jpg'
 import {value_converter} from '../../data'
 import moment from "moment";
-const PlayerVideo = ({videoId ,categoryId}) => {
+import { useParams } from 'react-router-dom'
+const PlayerVideo = () => {
+
+    const {videoId} = useParams();
     const API_KEY = import.meta.env.VITE_API_KEY;
     const [apiData,setApiData] = useState(null);
     const [channelData, setChannelData] = useState(null);
@@ -29,13 +32,13 @@ const PlayerVideo = ({videoId ,categoryId}) => {
 
     const fetchCommentData = async()=>{
         //fetching video comments
-        const commentData_url = `https://youtube.googleapis.com/youtube/v3/commentThreads?part=snippet%2Creplies&videoId=${videoId}&key=${API_KEY}`
+        const commentData_url = `https://youtube.googleapis.com/youtube/v3/commentThreads?part=snippet%2Creplies&maxResults=50&videoId=${videoId}&key=${API_KEY}`
         await fetch(commentData_url).then(res=>res.json()).then(data=>setCommentData(data.items))
     }
 
     useEffect(()=>{
         fetchVideoData();
-    },[])
+    },[videoId])
 
      useEffect(()=>{
         fetchCommentData();
@@ -81,9 +84,9 @@ const PlayerVideo = ({videoId ,categoryId}) => {
                             <p>{item.snippet.topLevelComment.snippet.textDisplay}</p>
                             <div className="comment-action">
                                 <img src={like} alt="" />
-                                <span>244</span>
+                                <span>{value_converter(item.snippet.topLevelComment.snippet.likeCount)}</span>
                                 <img src={dislike} alt="" />
-                                <span>10</span>
+                                <span></span>
                              </div>
                         </div>
                      </div>

@@ -1,57 +1,40 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import './Recommended.css'
-import thumbnail1 from '../../assets/thumbnail1.png'
-import thumbnail2 from '../../assets/thumbnail2.png'
-import thumbnail3 from '../../assets/thumbnail3.png'
-import thumbnail4 from '../../assets/thumbnail4.png'
-import thumbnail5 from '../../assets/thumbnail5.png'
-const Recommended = () => {
+import { value_converter } from '../../data'
+import moment from "moment";
+import { Link } from 'react-router-dom';
+const API_KEY = import.meta.env.VITE_API_KEY;
+const Recommended = ({categoryId}) => {
+
+  const [apiData, setApiData] = useState([]);
+
+  const fetchData = async()=>{
+
+    const relatedVideo_url = `https://youtube.googleapis.com/youtube/v3/videos?part=snippet%2CcontentDetails%2Cstatistics&chart=mostPopular&maxResults=45&regionCode=US&videoCategoryId=${categoryId}&key=${API_KEY}`
+    await fetch(relatedVideo_url).then(res=>res.json()).then(data=>setApiData(data.items))
+  }
+
+  useEffect(()=>{
+    fetchData();
+  },[])
+
+
+
   return (
     <div className='recommended'>
-      <div className="side-video-list">
-        <img src={thumbnail1} alt="" />
-        <div className="vid-info">
-            <h4>Learn React</h4>
-            <p>Eray Ates</p>
-            <p>49589 Views</p>
-        </div>
-      </div>
-
-      <div className="side-video-list">
-        <img src={thumbnail2} alt="" />
-        <div className="vid-info">
-            <h4>Learn React</h4>
-            <p>Eray Ates</p>
-            <p>49589 Views</p>
-        </div>
-      </div>
-
-      <div className="side-video-list">
-        <img src={thumbnail3} alt="" />
-        <div className="vid-info">
-            <h4>Learn React</h4>
-            <p>Eray Ates</p>
-            <p>49589 Views</p>
-        </div>
-      </div>
-
-      <div className="side-video-list">
-        <img src={thumbnail4} alt="" />
-        <div className="vid-info">
-            <h4>Learn React</h4>
-            <p>Eray Ates</p>
-            <p>49589 Views</p>
-        </div>
-      </div>
-
-      <div className="side-video-list">
-        <img src={thumbnail5} alt="" />
-        <div className="vid-info">
-            <h4>Learn React</h4>
-            <p>Eray Ates</p>
-            <p>49589 Views</p>
-        </div>
-      </div>
+      {apiData.map((item,index)=>{
+        return(
+            <Link to ={`/video/${item.snippet.categoryId}/${item.id}`} className="side-video-list">
+              <img src={item?item.snippet.thumbnails.medium.url:""} alt="" />
+              <div className="vid-info">
+                <h4>{item?item.snippet.title:""}</h4>
+                <p>{item?item.snippet.channelTitle:""}</p>
+                <p>{item?value_converter(item.statistics.viewCount):""} Views &bull; {item?moment(item.snippet.publishedAt).fromNow():""} </p>
+              </div>
+            </Link>
+        )
+      })}
+      
     </div>
   )
 }

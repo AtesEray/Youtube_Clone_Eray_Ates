@@ -8,7 +8,7 @@ const Video = () => {
   return (
     <div className='play-container'>
       <PlayerVideo videoId ={videoId} categoryId={categoryId}></PlayerVideo>
-      <Recommended></Recommended>
+      <Recommended categoryId={categoryId}></Recommended>
     </div>
   )
 }

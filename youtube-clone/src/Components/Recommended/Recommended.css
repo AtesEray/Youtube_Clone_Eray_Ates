@@ -9,7 +9,8 @@
 }
 .side-video-list img{
     flex-basis: 49%;
-    width: 50%;
+    width: 20%;
+    border-radius: 8px;
 }
 
 .vid-info{
@@ -17,5 +18,11 @@
 }
 .vid-info h4{
     font-size: 13px;
-    margin-bottom: 5px;
+    margin-bottom: 10px;
+    margin-top: 10px;
+}
+.vid-info p{
+    color: #5a5a5a;
+    font-size: 10px;
+    margin-bottom: 10px;
 }
