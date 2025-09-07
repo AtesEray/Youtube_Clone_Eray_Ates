@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import "./PlayerVideo.css"
 import video1 from '../../assets/video.mp4'
 import like from '../../assets/like.png'
@@ -7,89 +7,89 @@ import share from '../../assets/share.png'
 import save from '../../assets/save.png'
 import eray from '../../assets/eray.jpg'
 import user_profile from '../../assets/user_profile.jpg'
-const PlayerVideo = () => {
+import {value_converter} from '../../data'
+import moment from "moment";
+const PlayerVideo = ({videoId ,categoryId}) => {
+    const API_KEY = import.meta.env.VITE_API_KEY;
+    const [apiData,setApiData] = useState(null);
+    const [channelData, setChannelData] = useState(null);
+    const [commentData, setCommentData] = useState([]);
+
+    const fetchVideoData = async()=>{
+        // Fetching videos data.
+        const videoDetails_url = `https://youtube.googleapis.com/youtube/v3/videos?part=snippet%2CcontentDetails%2Cstatistics&id=${videoId}&key=${API_KEY}`
+        await fetch(videoDetails_url).then(res=>res.json()).then(data=>setApiData(data.items[0]))
+    }
+
+    const fetchChannelData = async()=>{
+        //fetching channel data
+        const channelData_url = `https://youtube.googleapis.com/youtube/v3/channels?part=snippet%2CcontentDetails%2Cstatistics&id=${apiData.snippet.channelId}&key=${API_KEY}`;
+        await fetch(channelData_url).then(res=>res.json()).then(data=>setChannelData(data.items[0]))
+    }
+
+    const fetchCommentData = async()=>{
+        //fetching video comments
+        const commentData_url = `https://youtube.googleapis.com/youtube/v3/commentThreads?part=snippet%2Creplies&videoId=${videoId}&key=${API_KEY}`
+        await fetch(commentData_url).then(res=>res.json()).then(data=>setCommentData(data.items))
+    }
+
+    useEffect(()=>{
+        fetchVideoData();
+    },[])
+
+     useEffect(()=>{
+        fetchCommentData();
+    },[apiData])
+
+    useEffect(()=>{
+        fetchChannelData();
+    },[apiData])
+
   return (
     <div className='play-video'> 
-      <video src={video1} controls autoPlay muted></video>
-      <h3>Best project</h3>
+      <iframe  src={`https://www.youtube.com/embed/${videoId}?autoplay=1` } frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+      <h3>{apiData?apiData.snippet.title:"Title Here"}</h3>
       <div className="play-video-info">
-        <p>3939 Views &bull ; 2 days ago</p>
+        <p>{apiData?value_converter(apiData.statistics.viewCount):"16k"} &bull; {apiData?moment(apiData.snippet.publishedAt).fromNow():"1 day ago"}</p>
         <div>
-            <span><img src={like} alt="" />125</span>
-            <span><img src={dislike} alt="" />2</span>
+            <span><img src={like} alt="" />{apiData?value_converter(apiData.statistics.likeCount):125}</span>
+            <span><img src={dislike} alt="" /></span>
             <span><img src={share} alt="" />Share</span>
             <span><img src={save} alt="" />Save</span>
         </div>
       </div>
       <hr />
       <div className="publisher">
-        <img src={eray} alt="" />
+        <img src={channelData?channelData.snippet.thumbnails.default.url:""} alt="" />
         <div>
-            <p>Eray Ates</p>
-            <span>1M Subscribers</span>
+            <p>{apiData?apiData.snippet.channelTitle:"Eray Ates"}</p>
+            <span>{channelData?value_converter(channelData.statistics.subscriberCount):""} Subscribes</span>
         </div>
         <button>Subscribe</button>
       </div>
       <div className="vid-description">
-        <p>Learnig React</p>
-        <p>Thanks to youtube</p>
+        <p>{apiData?apiData.snippet.description:"Description"}</p>
         <hr />
-        <h4>130 Comments</h4>
-        <div className="comment">
-            <img src={user_profile} alt="" />
-            <div>
-                <h3>user1 <span>1 day ago</span></h3>
-                <p>This project is awesome!!</p>
-                <div className="comment-action">
-                    <img src={like} alt="" />
-                    <span>244</span>
-                    <img src={dislike} alt="" />
-                    <span>10</span>
-                </div>
-            </div>
-        </div>
+        <h4>{apiData?value_converter(apiData.statistics.commentCount):0} Comments</h4>
 
-        <div className="comment">
-            <img src={user_profile} alt="" />
-            <div>
-                <h3>user1 <span>1 day ago</span></h3>
-                <p>This project is awesome!!</p>
-                <div className="comment-action">
-                    <img src={like} alt="" />
-                    <span>244</span>
-                    <img src={dislike} alt="" />
-                    <span>10</span>
-                </div>
-            </div>
-        </div>
-
-        <div className="comment">
-            <img src={user_profile} alt="" />
-            <div>
-                <h3>user1 <span>1 day ago</span></h3>
-                <p>This project is awesome!!</p>
-                <div className="comment-action">
-                    <img src={like} alt="" />
-                    <span>244</span>
-                    <img src={dislike} alt="" />
-                    <span>10</span>
-                </div>
-            </div>
-        </div>
-
-        <div className="comment">
-            <img src={user_profile} alt="" />
-            <div>
-                <h3>user1 <span>1 day ago</span></h3>
-                <p>This project is awesome!!</p>
-                <div className="comment-action">
-                    <img src={like} alt="" />
-                    <span>244</span>
-                    <img src={dislike} alt="" />
-                    <span>10</span>
-                </div>
-            </div>
-        </div>
+        {commentData.map((item,index)=>{
+            return(
+                    <div key={index} className="comment">
+                        <img src={item.snippet.topLevelComment.snippet.authorProfileImageUrl} alt="" />
+                        <div>
+                            <h3>{item.snippet.topLevelComment.snippet.authorDisplayName} <span>1 day ago</span></h3>
+                            <p>{item.snippet.topLevelComment.snippet.textDisplay}</p>
+                            <div className="comment-action">
+                                <img src={like} alt="" />
+                                <span>244</span>
+                                <img src={dislike} alt="" />
+                                <span>10</span>
+                             </div>
+                        </div>
+                     </div>
+            )
+        })}
+        
       </div>
     </div>
   )
