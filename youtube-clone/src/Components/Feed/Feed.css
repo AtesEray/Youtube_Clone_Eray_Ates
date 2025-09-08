@@ -26,3 +26,23 @@
 .card p{
     font-size: 14px;
 }
+
+
+@media (max-width:900px) {
+    .menu-icon{
+        display: none;
+    }
+    .nav-right img{
+        display: none;
+    }
+    .nav-right .user-icon{
+        display: block;
+        width: 30px;
+    }
+    .nav-middle .search-box input{
+        width: 100px;
+    }
+    .logo{
+        width: 30px;
+    }
+}
